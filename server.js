@@ -1,10 +1,10 @@
-require('dotenv').config();
+require('dotenv').config(); 
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-const taskRoutes = require('./routes/taskRoutes'); // ✅ Import Task Routes
-const aiRoutes = require('./routes/aiRoutes'); // ✅ Import AI Routes (For Future Use)
+const taskRoutes = require('./routes/taskRoutes');  // ✅ Import Task Routes
+const aiRoutes = require('./routes/aiRoutes');      // ✅ Import AI Routes
 
 const app = express();
 
@@ -12,20 +12,22 @@ const app = express();
 app.use(express.json());  // Parse JSON requests
 app.use(cors());          // Handle CORS policy
 
-// ✅ Debugging: Print MONGO_URI
-console.log("🔍 MONGO_URI:", process.env.MONGO_URI);
+// ✅ Debugging: Print MONGO_URI (Only in Development Mode)
+if (process.env.NODE_ENV !== 'production') {
+    console.log("🔍 MONGO_URI:", process.env.MONGO_URI);
+}
 
 // ✅ Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-.then(() => console.log("✅ MongoDB Connected"))
-.catch(err => console.error("❌ MongoDB Connection Error:", err));
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("✅ MongoDB Connected"))
+    .catch(err => {
+        console.error("❌ MongoDB Connection Error:", err);
+        process.exit(1);  // Exit process on database failure
+    });
 
 // ✅ API Routes
 app.use('/api/tasks', taskRoutes);  // ✅ Task API Routes
-app.use('/api/ai', aiRoutes);       // ✅ AI API Routes (For Future Use)
+app.use('/api/ai', aiRoutes);       // ✅ AI API Routes
 
 // ✅ Test Route
 app.get('/test', (req, res) => {
